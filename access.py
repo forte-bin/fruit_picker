@@ -57,13 +57,10 @@ class Tester(object):
                 path = "/"
             if self.verbosity: print "[+] Checking: server=" + server + " path=" + path + " port=" + str(self.port) + " ssl=" + ("True" if self.ssl else "False")
             # this line needs to be changed for normal opperation
-            h = {"Host":server,"X-AntiForgeryToken":"GyXpZeTcl1bNiwspCQ2mvFLXeJ-JjxQo0MHn4SnklsBru__rJhKGpcZ8_6eV87YPkw0yhol9UUcP1Qnj7r3qZkc6jTVR3cEIsXOfIgl2nrMEQf7Vu8Z8n3nPJEy635-JUZBSpQ2:GqcX5Bhx5rd8KyPLvyaEsmq2euVm92U7uztVbRQE8ymH0QHKL7Dtcw2HfFMS1ynqZSeZU6suhasNGbHNA6u5o5NUd2SwUQSnHh3XdnLPpAYPLeM-EVFUzWl-XmkY0jwc1ACAi19IjI2QFJ-zFbuusYPwzr1Suz8uwWX1y_gqAaHwgk4X0"}.copy()
+            h = {"Host":server}.copy()
             if cookie_jar:
                 h.update(cookie_jar)
 
-            #for i in h:
-            #    print i + " " + h[i]
-            
             r = self.request("GET", server, path, headers=h)
 
             if r:
