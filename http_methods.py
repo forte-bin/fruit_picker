@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 ## Tests the given webserver for some possibly dangerous HTTP methods
 
-import sys, getopt
+import sys, argparse, time
 import httplib, urllib
 
-class Tester(object):
-    def __init__(self, url, port=None, ssl=None, verbosity=15):
+class http_methods(object):
+    def __init__(self, url, port=None, ssl=None, verbosity=True):
         self.url = url
         self.server = url.split('/')[0]
         self.path = '/'+'/'.join(url.split('/')[1:])
@@ -39,10 +39,13 @@ class Tester(object):
     def test(self):
         self.get()
         self.post()
-        self.head()
+        #time.sleep(2)
+	self.head()
         self.options()
+	#time.sleep(2)
         self.trace()
         self.track()
+	#time.sleep(2)
         self.put()
         #self.delete()
         self.connect()
@@ -79,7 +82,7 @@ class Tester(object):
         r = self.request("OPTIONS", self.path, headers={"Host":self.server})
         body = r.read()
 
-        if r.getheader('allow') and r.status == httplib.OK:
+        if r.getheader('allow') or r.status == httplib.OK:
             print "Reported Allowed Methods: " + r.getheader('allow')
             print "OPTIONS: "+str(r.status)+" ("+r.reason+")"
         else:
@@ -132,29 +135,18 @@ def usage():
     print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
 
 if __name__ == "__main__":
-    if len(sys.argv) < 1:
-        usage()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:s", ['port=', 'ssl'])
-    except getopt.GetoptError, e:
-        print str(e)
-        usage()
-        sys.exit(2)
+    parser = argparse.ArgumentParser(description="This is a script that checks the available HTTP methods (does not currently test delete)")
+    parser.add_argument("-p","--port", type=int, help="the webserver port")
+    parser.add_argument("-s","--ssl", action="store_true", help="whether or not to use ssl")
+    parser.add_argument("-v","--verbose", action="store_true", default=False, help="turn on verbose output")
+    parser.add_argument("url", help="the web server to test. Remove http://")
+    args = parser.parse_args()
 
-    url = None
-    port = None
-    ssl = False
-    for o, a in opts:
-        if o in ('-p', '--port'):
-            port = int(a)
-        elif o in ('-s', '--ssl'):
-            ssl = True
-    if len(args) < 1:
-        usage()
-        sys.exit(2)
-
-    url = args[0]
-
-    t = Tester(url, port, ssl,15)
+    url = args.url
+    port = args.port
+    ssl = args.ssl
+    verbosity = args.verbose
+	
+    t = http_methods(url, port, ssl, verbosity)
     t.print_vars()
     t.test()

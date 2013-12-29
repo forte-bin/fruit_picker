@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 ## Tests the given webserver for some possibly leaky HTTP headers
 
-import sys, getopt
+import sys, argparse
 import urllib2, cookielib
 
-class Tester(object):
+class cookie_settings(object):
     def __init__(self, url, port=None, ssl=None, verbosity=True):
         self.url = url
         self.server = url.split('/')[0]
@@ -59,12 +59,11 @@ class Tester(object):
                 else:
                     print "[+]\tHttpOnly flag IS set"
 
-
-
-def usage():
-    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
+#def usage():
+#    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
 
 if __name__ == "__main__":
+    """	
     if len(sys.argv) < 1:
         usage()
     try:
@@ -73,12 +72,21 @@ if __name__ == "__main__":
         print str(e)
         usage()
         sys.exit(2)
+    """
 
-    server = None
-    port = None
-    ssl = False
-    verbosity = True
+    parser = argparse.ArgumentParser(description="This is a script that checks cookie settings for a website.")
+    parser.add_argument("-p","--port", type=int, help="the webserver port")
+    parser.add_argument("-s","--ssl", action="store_true", help="whether or not to use ssl")
+    parser.add_argument("-v","--verbose", action="store_true", default=False, help="turn on verbose output")
+    parser.add_argument("url", help="the URL to test. Remove http://")
+    args = parser.parse_args()
 
+    server = args.url
+    port = args.port
+    ssl = args.ssl
+    verbosity = args.verbose
+
+    """
     for o, a in opts:
         if o in ('-p', '--port'):
             port = int(a)
@@ -89,7 +97,8 @@ if __name__ == "__main__":
         sys.exit(2)
 
     server = args[0]
+    """
 
-    t = Tester(server, port, ssl, verbosity)
+    t = cookie_settings(server, port, ssl, verbosity)
     print "[*] Analyzing Cookie Settings..."
     t.test()

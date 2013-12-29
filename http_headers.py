@@ -5,12 +5,13 @@
 #
 # TODO: Add support for checking clickjacking headers
 # TODO: Add support for checking Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers headers
+# TODO: Add support for HSTS header
 #
 
-import sys, getopt
+import sys, argparse
 import httplib, urllib
 
-class Tester(object):
+class http_headers(object):
     def __init__(self, url, port=None, ssl=None, verbosity=True):
         self.url = url
         self.server = url.split('/')[0]
@@ -56,36 +57,20 @@ class Tester(object):
                 print l[0]+":",l[1]
                 # l[0] not in dict
 
-def usage():
-    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
-
 if __name__ == "__main__":
-    if len(sys.argv) < 1:
-        usage()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:s", ['port=', 'ssl'])
-    except getopt.GetoptError, e:
-        print str(e)
-        usage()
-        sys.exit(2)
+    parser = argparse.ArgumentParser(description="This is a script that checks for HTTP headers that disclose too much information.")
+    parser.add_argument("-p","--port", type=int, help="the webserver port")
+    parser.add_argument("-s","--ssl", action="store_true", help="whether or not to use ssl")
+    parser.add_argument("-v","--verbose", action="store_true", default=False, help="turn on verbose output")
+    parser.add_argument("url", help="the URL to scan. Remove http://")
+    args = parser.parse_args()
 
-    url = None
-    port = None
-    ssl = False
-    verbosity = True
-
-    for o, a in opts:
-        if o in ('-p', '--port'):
-            port = int(a)
-        elif o in ('-s', '--ssl'):
-            ssl = True
-    if len(args) < 1:
-        usage()
-        sys.exit(2)
-
-    url = args[0]
-
-    t = Tester(url, port, ssl, verbosity)
+    url = args.url
+    port = args.port
+    ssl = args.ssl
+    verbosity = args.verbose
+    
+    t = http_headers(url, port, ssl, verbosity)
     print "[*] Testing for leaky headers..."
     common,possible = t.test()
 
