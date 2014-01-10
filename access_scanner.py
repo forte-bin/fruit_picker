@@ -47,7 +47,7 @@ class access_scanner(object):
         urls = self.get_urls(urls_file)
         if cookie_jar:
             cookie_jar = self.get_cookie_jar(cookie_jar)
-        
+
         for url in urls:
             url = url.strip()
             s = url.split("/")
@@ -64,7 +64,7 @@ class access_scanner(object):
             r = self.request("GET", server, path, headers=h)
 
             if r:
-                body = r.read() 
+                body = r.read()
                 if self.verbosity: print "[+] Status: " + str(r.status)
                 if r.status == httplib.OK:
                     flagged_urls.append(url)
@@ -75,16 +75,6 @@ class access_scanner(object):
 #    print "Usage: %s [-p <port>] [-s true|false] [-c <file_containing_cookies>] <file_containing_urls>"
 
 if __name__ == "__main__":
-    """
-    if len(sys.argv) < 1:
-        usage()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:svc:", ['port', 'ssl', 'verbose', 'cookies'])
-    except getopt.GetoptError, e:
-        print str(e)
-        usage()
-        sys.exit(2)
-    """
 
     parser = argparse.ArgumentParser(description="This is a script that checks for access to pages with/out SSL and with/out authorization.")
     parser.add_argument("-p","--port", type=int, help="the webserver port")
@@ -100,32 +90,12 @@ if __name__ == "__main__":
     ssl = args.ssl
     verbosity = args.verbose
     auth = True if args.cookies else False
-    """
-    for o, a in opts:
-        if o in ('-p', '--port'):
-            port = int(a)
-        elif o in ('-s', '--ssl'):
-            ssl = True
-        elif o in ('-c', '--cookies'):
-            auth = True
-            cookie_jar = a
-        elif o in ('-v', '--verbose'):
-            verbosity = True
-        else:
-            assert False, "unhandled option"
-
-    if len(args) < 1:
-        usage()
-        sys.exit(2)
-
-    urls_file = args[0]
-    """
 
     t = access_scanner(urls_file, verbosity, port, ssl)
-    
+
     print "[*] Checking " + ("with " if ssl else "without ") + "SSL and " + ("with " if auth else "without ") + "authorization..."
-    print "[*] ----- "   
- 
+    print "[*] ----- "
+
     flagged_urls = t.test(urls_file, cookie_jar)
 
     if len(flagged_urls) > 0:

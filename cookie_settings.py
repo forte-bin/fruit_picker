@@ -36,7 +36,7 @@ class cookie_settings(object):
         if len(cookies) == 0:
             print "No Cookies Set..."
         else:
-            #print cookies 
+            #print cookies
             for cookie in cookies:
                 if verbosity:
                     print "-----"
@@ -63,16 +63,6 @@ class cookie_settings(object):
 #    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
 
 if __name__ == "__main__":
-    """	
-    if len(sys.argv) < 1:
-        usage()
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:s", ['port=', 'ssl'])
-    except getopt.GetoptError, e:
-        print str(e)
-        usage()
-        sys.exit(2)
-    """
 
     parser = argparse.ArgumentParser(description="This is a script that checks cookie settings for a website.")
     parser.add_argument("-p","--port", type=int, help="the webserver port")
@@ -85,19 +75,6 @@ if __name__ == "__main__":
     port = args.port
     ssl = args.ssl
     verbosity = args.verbose
-
-    """
-    for o, a in opts:
-        if o in ('-p', '--port'):
-            port = int(a)
-        elif o in ('-s', '--ssl'):
-            ssl = True
-    if len(args) < 1:
-        usage()
-        sys.exit(2)
-
-    server = args[0]
-    """
 
     t = cookie_settings(server, port, ssl, verbosity)
     print "[*] Analyzing Cookie Settings..."

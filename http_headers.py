@@ -6,6 +6,7 @@
 # TODO: Add support for checking clickjacking headers
 # TODO: Add support for checking Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers headers
 # TODO: Add support for HSTS header
+# TODO: Add support for headers from https://securityheaders.com/
 #
 
 import sys, argparse
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     port = args.port
     ssl = args.ssl
     verbosity = args.verbose
-    
+
     t = http_headers(url, port, ssl, verbosity)
     print "[*] Testing for leaky headers..."
     common,possible = t.test()
