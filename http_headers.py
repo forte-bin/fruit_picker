@@ -35,21 +35,25 @@ class http_headers(object):
         return c.getresponse()
 
     def test(self):
-        r = self.request("GET", self.path, headers={"Host":self.server})
-        common = list()
-        possible = list()
-        for l in r.getheaders():
-            if "server" in l[0]:
-                common.append("[-]\t"+l[0]+": "+l[1])
-            elif "x-powered-by" in l[0]:
-                common.append("[-]\t"+l[0]+": "+l[1])
-            elif "x-aspnet-version" in l[0]:
-                common.append("[-]\t"+l[0]+": "+l[1])
-            elif "x-aspnetmvc-version" in l[0]:
-                common.append("[-]\t"+l[0]+": "+l[1])
-            elif "x-" in l[0]:
-                possible.append("[-]\t"+l[0]+": "+l[1])
-        return common,possible
+        try:
+            r = self.request("GET", self.path, headers={"Host":self.server})
+            common = list()
+            possible = list()
+            for l in r.getheaders():
+                if "server" in l[0]:
+                    common.append("[-]\t"+l[0]+": "+l[1])
+                elif "x-powered-by" in l[0]:
+                    common.append("[-]\t"+l[0]+": "+l[1])
+                elif "x-aspnet-version" in l[0]:
+                    common.append("[-]\t"+l[0]+": "+l[1])
+                elif "x-aspnetmvc-version" in l[0]:
+                    common.append("[-]\t"+l[0]+": "+l[1])
+                elif "x-" in l[0]:
+                    possible.append("[-]\t"+l[0]+": "+l[1])
+            return common,possible
+        except:
+            print "[!] test failed"
+            return [],[]
 
     def list_possible(self):
         r = self.request("GET", "/", headers={"Abcd":"efghij"})
@@ -57,6 +61,22 @@ class http_headers(object):
             if "x-" in l[0]:
                 print l[0]+":",l[1]
                 # l[0] not in dict
+
+    def print_results(self,common,possible):
+        if len(common) > 0:
+            print "[*] Found the following common leaky headers:"
+            for e in common:
+                print e
+        else:
+            print "[+] Found no common leaky headers"
+
+        if len(possible) > 0:
+            print "[*] Found the following possibly leaky headers:"
+            for e in possible:
+                print e
+        else:
+            print "[+] Found no other possibly leaky headers"
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This is a script that checks for HTTP headers that disclose too much information.")
@@ -74,18 +94,6 @@ if __name__ == "__main__":
     t = http_headers(url, port, ssl, verbosity)
     print "[*] Testing for leaky headers..."
     common,possible = t.test()
-
-    if len(common) > 0:
-        print "[*] Found the following common leaky headers:"
-        for e in common:
-            print e
-    else:
-        print "[+] Found no common leaky headers"
-
-    if len(possible) > 0:
-        print "[*] Found the following possibly leaky headers:"
-        for e in possible:
-            print e
-    else:
-        print "[+] Found no other possibly leaky headers"
+    t.print_results(common,possible)
+    
 

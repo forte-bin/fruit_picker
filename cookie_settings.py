@@ -49,8 +49,9 @@ class cookie_settings(object):
                     if "httponly" in crumb.lower():
                         http_only = True
                     if "secure" in crumb.lower():
+                        # print "crumb lower: " + crumb.lower()
                         secure = True
-                if self.ssl and not secure:
+                if not secure:
                     print "[-]\tSecure flag is NOT set!"
                 else:
                     print "[+]\tSecure flag IS set"

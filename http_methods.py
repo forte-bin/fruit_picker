@@ -37,27 +37,54 @@ class http_methods(object):
         return c.getresponse()
 
     def test(self):
-        self.get()
-        self.post()
-        #time.sleep(2)
-	self.head()
-        self.options()
-	#time.sleep(2)
-        self.trace()
-        self.track()
-	#time.sleep(2)
-        self.put()
-        #self.delete()
-        self.connect()
+        try:
+                try:
+                    self.get()
+                except:
+                    print "[!] get failed"
+                try:
+                    self.post()
+                except:
+                    print "[!] post failed"
+                try:
+                    self.head()
+                except:
+                    print "[!] head failed"
+                try:
+                    self.options()
+                except:
+                    print "[!] options failed"
+                try:
+                    self.trace()
+                except:
+                    print "[!] trace failed"
+                try:
+                    self.track()
+                except:
+                    print "[!] track failed"
+                try:
+                    self.put()
+                except:
+                    print "[!] put failed"
+                try:
+                    self.connect()
+                except:
+                    print "[!] connect failed"
+                # try:
+                #    self.delete()
+                # except:
+                #    print "[!] delete failed"
+        except:
+            print "[!] test failed"
 
     def get(self):
         r = self.request("GET", self.path, headers={"Host":self.server})
         body = r.read()
 
         if self.path in body or r.status == httplib.OK:
-            print "GET:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] GET:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "GET:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] GET:\t "+str(r.status)+" ("+r.reason+")"
 
     def post(self):
         params = urllib.urlencode({'testPOST': 'POSTtest'})
@@ -65,28 +92,28 @@ class http_methods(object):
         body = r.read()
 
         if self.path in body or r.status == httplib.OK:
-            print "POST:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] POST:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "POST:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] POST:\t "+str(r.status)+" ("+r.reason+")"
 
     def head(self):
         r = self.request("HEAD", self.path, headers={"Host":self.server})
         body = r.read()
 
         if r.status == httplib.OK and len(body) == 0:
-            print "HEAD:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] HEAD:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "HEAD:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] HEAD:\t "+str(r.status)+" ("+r.reason+")"
 
     def options(self):
         r = self.request("OPTIONS", self.path, headers={"Host":self.server})
         body = r.read()
 
         if r.getheader('allow') or r.status == httplib.OK:
-            print "Reported Allowed Methods: " + r.getheader('allow')
-            print "OPTIONS: "+str(r.status)+" ("+r.reason+")"
+            print "[+] Reported Allowed Methods: " + r.getheader('allow')
+            print "[+] OPTIONS:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "OPTIONS: "+str(r.status)+" ("+r.reason+")"
+            print "[+] OPTIONS:\t "+str(r.status)+" ("+r.reason+")"
 
     def trace(self):
         # This needs some work, some apps will allow TRACE on certain paths but not the root.
@@ -94,45 +121,42 @@ class http_methods(object):
         body = r.read()
 
         if self.path in body and r.status == httplib.OK:
-            print "TRACE:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] TRACE:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "TRACE:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] TRACE:\t "+str(r.status)+" ("+r.reason+")"
 
     def track(self):
         r = self.request("TRACK", self.path, headers={"Host":self.server})
         body = r.read()
 
         if self.path in body and r.status == httplib.OK:
-            print "TRACK:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] TRACK:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "TRACK:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] TRACK:\t "+str(r.status)+" ("+r.reason+")"
 
     def put(self):
         r = self.request("PUT", self.path, "KEHKEHEKEHKEH")
 
         if r.status in (httplib.OK, httplib.CREATED, httplib.NO_CONTENT):
-            print "PUT:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] PUT:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "PUT:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] PUT:\t "+str(r.status)+" ("+r.reason+")"
 
     def delete(self):
         r = self.request("DELETE", self.path)
 
         if r.status in (httplib.OK, httplib.ACCEPTED, httplib.NO_CONTENT):
-            print "DELETE:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] DELETE:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "DELETE:\t "+str(r.status)+" ("+r.reason+")"
+            print "[+] DELETE:\t "+str(r.status)+" ("+r.reason+")"
 
     def connect(self):
         r = self.request("CONNECT", "localhost:80")
 
         if r.status in (httplib.OK, httplib.ACCEPTED, httplib.NO_CONTENT):
-            print "CONNECT: "+str(r.status)+" ("+r.reason+")"
+            print "[+] CONNECT:\t "+str(r.status)+" ("+r.reason+")"
         else:
-            print "CONNECT: "+str(r.status)+" ("+r.reason+")"
-
-def usage():
-    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
+            print "[+] CONNECT:\t "+str(r.status)+" ("+r.reason+")"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="This is a script that checks the available HTTP methods (does not currently test delete)")
