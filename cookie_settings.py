@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 ## Tests the given webserver for some possibly leaky HTTP headers
 
+#
+# TODO: Check for expiration date. If set then cookies are written to disk
+#
+
 import sys, argparse
 import urllib2, cookielib
 
