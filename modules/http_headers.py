@@ -1,12 +1,5 @@
 # Tests the given webserver for some possibly leaky HTTP headers
 
-#
-# TODO: Add support for checking clickjacking headers
-# TODO: Add support for checking Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers headers
-# TODO: Add support for HSTS header
-# TODO: Add support for headers from https://securityheaders.com/
-#
-
 import sys, argparse
 import httplib, urllib
 
@@ -35,32 +28,50 @@ class http_headers(object):
     def test(self):
         try:
             r = self.request("GET", self.path, headers={"Host":self.server})
-            common = list()
-            possible = list()
+            common      = list()
+            possible    = list()
+            missing     = list()
+            hsts_header = False
+            xframe_header = False
+            xss_header  = False
+
             for l in r.getheaders():
                 if "server" in l[0]:
-                    common.append("[-]\t"+l[0]+": "+l[1])
+                    common.append("\t"+l[0]+": "+l[1])
                 elif "x-powered-by" in l[0]:
-                    common.append("[-]\t"+l[0]+": "+l[1])
+                    common.append("\t"+l[0]+": "+l[1])
                 elif "x-aspnet-version" in l[0]:
-                    common.append("[-]\t"+l[0]+": "+l[1])
+                    common.append("\t"+l[0]+": "+l[1])
                 elif "x-aspnetmvc-version" in l[0]:
-                    common.append("[-]\t"+l[0]+": "+l[1])
+                    common.append("\t"+l[0]+": "+l[1])
+                elif "strict-transport-security" in l[0]:
+                    hsts_header = True
+                elif "x-frame-options" in l[0]:
+                    xframe_header = True
+                elif "x-xss-protection" in l[0]:
+                    xss_header = True
                 elif "x-" in l[0]:
-                    possible.append("[-]\t"+l[0]+": "+l[1])
-            return common,possible
-        except:
-            print "test failed"
-            return [],[]
+                    possible.append("\t"+l[0]+": "+l[1])
+
+            if not hsts_header:
+                missing.append("\tstrict-transport-security")
+            if not xss_header:
+                missing.append("\tx-xss-protection")
+            if not xframe_header:
+                missing.append("\tx-frame-options")
+    
+        except Exception as e:
+            print "test failed:", e
+
+        self.print_results(common,possible,missing)
 
     def list_possible(self):
         r = self.request("GET", "/", headers={"Abcd":"efghij"})
         for l in r.getheaders():
             if "x-" in l[0]:
                 print l[0]+":",l[1]
-                # l[0] not in dict
 
-    def print_results(self,common,possible):
+    def print_results(self,common,possible,missing):
         if len(common) > 0:
             print "Found the following common leaky headers:"
             for e in common:
@@ -74,6 +85,13 @@ class http_headers(object):
                 print e
         else:
             print "Found no other possibly leaky headers"
+
+        if len(missing) > 0:
+            print "The following security headers were missing:"
+            for e in missing:
+                print e
+        else:
+            print "Security related headers are present"
 
 
 if __name__ == "__main__":
@@ -91,7 +109,4 @@ if __name__ == "__main__":
 
     t = http_headers(url, port, ssl, verbosity)
     print "Testing for leaky headers..."
-    common,possible = t.test()
-    t.print_results(common,possible)
-    
-
+    t.test()
