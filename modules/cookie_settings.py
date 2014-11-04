@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-## Tests the given webserver for some possibly leaky HTTP headers
+# Tests the given webserver for some possibly leaky HTTP headers
 
 #
 # TODO: Check for expiration date. If set then cookies are written to disk
@@ -35,20 +33,18 @@ class cookie_settings(object):
 
     def test(self):
         r = self.request()
-        #print r.info()
         cookies = r.info().getallmatchingheaders("set-cookie")
         if len(cookies) == 0:
-            print "No Cookies Set..."
+            print "No cookies set..."
         else:
             #print cookies
             for cookie in cookies:
                 if verbosity:
-                    print "-----"
                     print cookie
                 http_only = False
                 secure = False
                 crumbs = cookie.split(";")
-                print "[*] Analyzing: "+crumbs[0].replace("Set-Cookie: ","")
+                print "Analyzing: "+crumbs[0].replace("Set-Cookie: ","")
                 for crumb in crumbs:
                     if "httponly" in crumb.lower():
                         http_only = True
@@ -56,13 +52,13 @@ class cookie_settings(object):
                         # print "crumb lower: " + crumb.lower()
                         secure = True
                 if not secure:
-                    print "[-]\tSecure flag is NOT set!"
+                    print "\tSecure flag is NOT set!"
                 else:
-                    print "[+]\tSecure flag IS set"
+                    print "\tSecure flag IS set"
                 if not http_only:
-                    print "[-]\tHttpOnly flag is NOT set!"
+                    print "\tHttpOnly flag is NOT set!"
                 else:
-                    print "[+]\tHttpOnly flag IS set"
+                    print "\tHttpOnly flag IS set"
 
 #def usage():
 #    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
@@ -82,5 +78,5 @@ if __name__ == "__main__":
     verbosity = args.verbose
 
     t = cookie_settings(server, port, ssl, verbosity)
-    print "[*] Analyzing Cookie Settings..."
+    print "Analyzing cookie settings..."
     t.test()

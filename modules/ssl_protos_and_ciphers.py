@@ -1,3 +1,5 @@
+# This tests for the protocols and ciphers used by a webserver 
+
 import socket, binascii, string, sys, csv, pickle, argparse
 
 class ssl_and_protocol_analyzer(object):
@@ -36,7 +38,7 @@ class ssl_and_protocol_analyzer(object):
 		elif data == '\x15': 
 			state =  False # Server Alert Code
 		else:
-			print "[!] Something is wrong with the server response"
+			print "Something is wrong with the server response"
 					
 		s.close()
 		return state
@@ -89,7 +91,7 @@ class ssl_and_protocol_analyzer(object):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		try:   s.connect((host, port))		
 		except socket.error, msg:
-			print "[!] Could not connect to target host: %s" % msg
+			print "Could not connect to target host: %s" % msg
 			s.close()
 			sys.exit()
 		return s
@@ -103,15 +105,15 @@ class ssl_and_protocol_analyzer(object):
 				space = "\t\t"
 			else:
 				space = "\t\t\t"
-			print "[+]\t%s (0x%s)%s[%s]" % ( cipher_suites[cipher_id]['name'], cipher_id , space, cipher_suites[cipher_id]['overall_strength'])
+			print "\t%s (0x%s)%s[%s]" % ( cipher_suites[cipher_id]['name'], cipher_id , space, cipher_suites[cipher_id]['overall_strength'])
 			if self.verbose: 
-				print "[+]\t\tSpecs: Kx=%s, Au=%s, Enc=%s, Bits=%s, Mac=%s" % ( cipher_suites[cipher_id]['kx'], cipher_suites[cipher_id]['au'], cipher_suites[cipher_id]['enc'], cipher_suites[cipher_id]['bits'], cipher_suites[cipher_id]['mac'] )
-				print "[+]\t\tScore: Kx/Au=%s, Enc/MAC=%s, Overall=%s" %  ( cipher_suites[cipher_id]['kxau_strength'], cipher_suites[cipher_id]['enc_strength'], cipher_suites[cipher_id]['overall_strength'])
+				print "\t\tSpecs: Kx=%s, Au=%s, Enc=%s, Bits=%s, Mac=%s" % ( cipher_suites[cipher_id]['kx'], cipher_suites[cipher_id]['au'], cipher_suites[cipher_id]['enc'], cipher_suites[cipher_id]['bits'], cipher_suites[cipher_id]['mac'] )
+				print "\t\tScore: Kx/Au=%s, Enc/MAC=%s, Overall=%s" %  ( cipher_suites[cipher_id]['kxau_strength'], cipher_suites[cipher_id]['enc_strength'], cipher_suites[cipher_id]['overall_strength'])
 			if not results.has_key(cipher_suites[cipher_id]['overall_strength']):
 				results[cipher_suites[cipher_id]['overall_strength']] = list()
 			results[cipher_suites[cipher_id]['overall_strength']].append(cipher_id)
 		else: 
-			print "[+] Undocumented cipher (0x%)" % cipher_id
+			print "Undocumented cipher (0x%)" % cipher_id
 			if not results.has_key("UNKNOWN"):
 				results["UNKNOWN"] = list()
 			results["UNKNOWN"].append(cipher_id)
@@ -125,29 +127,29 @@ class ssl_and_protocol_analyzer(object):
 			print ""
 		
 	def scan_fuzz_ciphers(self, protocols, cipher_suites, results):
-		print "[*] Fuzzing %s:%d for all possible cipher suite identifiers." % (self.host,self.port)
+		print "Fuzzing %s:%d for all possible cipher suite identifiers." % (self.host,self.port)
 		for protocol in protocols:
-			if self.verbose: print "[*] Using %s protocol..." % protocol
+			if self.verbose: print "Using %s protocol..." % protocol
 			for i in range(0,16777215):
 				cipher_id = '%06x' % i
 				if self.check_cipher(cipher_id,self.host,self.port): 
 					self.print_cipher(cipher_id,cipher_suites,results)
 
 	def scan_known_ciphers(self, protocols, cipher_suites, results):
-		print "[*] Scanning %s:%d for %d known cipher suites for %d supported protocol(s)." % (self.host,self.port,len(cipher_suites),len(protocols))
+		print "Scanning %s:%d for %d known cipher suites for %d supported protocol(s)." % (self.host,self.port,len(cipher_suites),len(protocols))
 		for protocol in protocols:
-			print "[*] Using %s protocol." % protocol
+			print "Using %s protocol." % protocol
 			for cipher_id in cipher_suites.keys():
 				if self.check_cipher(cipher_id, self.host, self.port, protocol): 
  					self.print_cipher(cipher_id, cipher_suites, results)
 
 	def scan_known_protocols(self):
-		print "[*] Scanning %s:%d for support of %d known protocols." % (self.host,self.port,len(self.handshakes))
+		print "Scanning %s:%d for support of %d known protocols." % (self.host,self.port,len(self.handshakes))
 		supports = list()
 		for handshake in self.handshakes:
 			supported = self.check_protocol(self.host,self.port,handshake)
 			if supported:
-				print "[+] %s supported." % handshake
+				print "%s supported." % handshake
 				if handshake != "SSL v2.0":
 					supports.append(handshake)
 		return supports
@@ -171,4 +173,3 @@ if __name__ == '__main__':
 	else:
 		t.scan_known_ciphers(protocols, cipher_suites, results)
 
-	#if results: output_report(results)

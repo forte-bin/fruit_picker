@@ -16,7 +16,7 @@ class timing_attack(object):
         self.attempts = attempts
 
     def print_config(self):
-        print "--- config ---"
+        print "config -"
         print "port:",self.port
         print "ssl:",self.ssl
         print "verbose:",self.verbose
@@ -78,6 +78,6 @@ if __name__ == "__main__":
     for u in usernames:
         results[u] = t.test(u)
 
-    print "--- results ---"
+    print "results:"
     for r in results.keys():
         print r + " : " + str(results[r][0])

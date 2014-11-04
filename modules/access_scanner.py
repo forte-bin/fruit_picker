@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-## Tests the given urls for unauthenticated and/or insecure access
+# Tests the given urls for unauthenticated and/or insecure access
 
 import sys, argparse
 import httplib, urllib
@@ -33,7 +31,6 @@ class access_scanner(object):
     def request(self, method, server, path, headers):
         connection = self.get_connection(server)
         headers = headers or {}
-        #connection.set_debuglevel(1)
         connection.request(method, path, headers=headers)
         response = None
         try:
@@ -50,29 +47,33 @@ class access_scanner(object):
 
         for url in urls:
             url = url.strip()
-            s = url.split("/")
-            server = s[2]
+            if "//" in url:
+                s = url.split("/")
+                server = s[2]
+            else:
+                s = url.split("/")
+                server = s[0]
             path = "/" + "/".join(s[3:])
             if len(path) == 0:
                 path = "/"
-            if self.verbosity: print "[+] Checking: server=" + server + " path=" + path + " port=" + str(self.port) + " ssl=" + ("True" if self.ssl else "False")
-            # this line needs to be changed for normal opperation
+            if self.verbosity: print "Checking - server: " + server + " path: " + path + " port: " + str(self.port) + " ssl: " + ("True" if self.ssl else "False")
             h = {"Host":server}.copy()
             if cookie_jar:
                 h.update(cookie_jar)
+            try:
+                r = self.request("GET", server, path, headers=h)
+                if r:
+                    body = r.read()
+                    if self.verbosity: print "Status: " + str(r.status) + " - " + r.reason
+                    if r.status == httplib.OK:
+                        flagged_urls.append(url)
+                else:
+                    if self.verbosity: print "No response returned"
+            except:
+                if self.verbosity: print "Request failed"
 
-            r = self.request("GET", server, path, headers=h)
-
-            if r:
-                body = r.read()
-                if self.verbosity: print "[+] Status: " + str(r.status)
-                if r.status == httplib.OK:
-                    flagged_urls.append(url)
-                if self.verbosity: print "[+] -----"
         return flagged_urls
 
-#def usage():
-#    print "Usage: %s [-p <port>] [-s true|false] [-c <file_containing_cookies>] <file_containing_urls>"
 
 if __name__ == "__main__":
 
@@ -93,15 +94,14 @@ if __name__ == "__main__":
 
     t = access_scanner(urls_file, verbosity, port, ssl)
 
-    print "[*] Checking " + ("with " if ssl else "without ") + "SSL and " + ("with " if auth else "without ") + "authorization..."
-    print "[*] ----- "
+    print "Checking " + ("with " if ssl else "without ") + "SSL and " + ("with " if auth else "without ") + "authorization..."
 
     flagged_urls = t.test(urls_file, cookie_jar)
 
     if len(flagged_urls) > 0:
-        print "[*] Was able to access the following:"
+        print "Was able to access the following:"
         for url in flagged_urls:
-            print "[+]\t" + url
+            print "\t" + url
     else:
-        print "[*] Was not able to access any..."
+        print "Was not able to access any of the supplied locations..."
 

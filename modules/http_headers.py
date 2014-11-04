@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-## Tests the given webserver for some possibly leaky HTTP headers
+# Tests the given webserver for some possibly leaky HTTP headers
 
 #
 # TODO: Add support for checking clickjacking headers
@@ -13,7 +11,7 @@ import sys, argparse
 import httplib, urllib
 
 class http_headers(object):
-    def __init__(self, url, port=None, ssl=None, verbosity=True):
+    def __init__(self, url, port=None, ssl=False, verbosity=True):
         self.url = url
         self.server = url.split('/')[0]
         self.path = '/'+'/'.join(url.split('/')[1:])
@@ -23,9 +21,9 @@ class http_headers(object):
 
     def getconn(self):
         if self.ssl:
-            c = httplib.HTTPSConnection(self.server, self.port, timeout=10)
+            c = httplib.HTTPSConnection(self.server, self.port, timeout=5)
         else:
-            c = httplib.HTTPConnection(self.server, self.port, timeout=10)
+            c = httplib.HTTPConnection(self.server, self.port, timeout=5)
         return c
 
     def request(self, method, path, body=None, headers=None):
@@ -52,7 +50,7 @@ class http_headers(object):
                     possible.append("[-]\t"+l[0]+": "+l[1])
             return common,possible
         except:
-            print "[!] test failed"
+            print "test failed"
             return [],[]
 
     def list_possible(self):
@@ -64,18 +62,18 @@ class http_headers(object):
 
     def print_results(self,common,possible):
         if len(common) > 0:
-            print "[*] Found the following common leaky headers:"
+            print "Found the following common leaky headers:"
             for e in common:
                 print e
         else:
-            print "[+] Found no common leaky headers"
+            print "Found no common leaky headers"
 
         if len(possible) > 0:
-            print "[*] Found the following possibly leaky headers:"
+            print "Found the following possibly leaky headers:"
             for e in possible:
                 print e
         else:
-            print "[+] Found no other possibly leaky headers"
+            print "Found no other possibly leaky headers"
 
 
 if __name__ == "__main__":
@@ -92,7 +90,7 @@ if __name__ == "__main__":
     verbosity = args.verbose
 
     t = http_headers(url, port, ssl, verbosity)
-    print "[*] Testing for leaky headers..."
+    print "Testing for leaky headers..."
     common,possible = t.test()
     t.print_results(common,possible)
     

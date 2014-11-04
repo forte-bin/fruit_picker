@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-## grabs the robots.txt for a domain
+# grabs the robots.txt for a domain
 
 import sys, argparse
 import httplib, urllib
@@ -16,9 +14,9 @@ class robots_txt(object):
 
     def getconn(self):
         if self.ssl:
-            c = httplib.HTTPSConnection(self.server, self.port, timeout=10)
+            c = httplib.HTTPSConnection(self.server, self.port, timeout=5)
         else:
-            c = httplib.HTTPConnection(self.server, self.port, timeout=10)
+            c = httplib.HTTPConnection(self.server, self.port, timeout=5)
         return c
 
     def request(self, method, path, body=None, headers=None):
@@ -31,7 +29,11 @@ class robots_txt(object):
         try:
             r = self.request("GET", "/robots.txt", headers={"Host":self.server})
             if r.status == 200:
-                return r.read().strip()
+                contents = r.read().strip()
+                if contents.length > 3 and contents not "404":
+                    return contents
+                else:
+                    return "404"
             else:
                 return "404"
         except:
@@ -52,11 +54,10 @@ if __name__ == "__main__":
     verbosity = args.verbose
 
     t = robots_txt(url, port, ssl, verbosity)
-    print "[*] grabbing robots.txt for %s" % url
+    print "grabbing robots.txt for %s" % url
     r = t.test()
     if r:
-        print "-----"
-        print r
-        print "-----"
+        if r is not "404" and r is not "request failed":
+            print r
     else:
-        "[!] failed"
+        "failed"
