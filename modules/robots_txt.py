@@ -33,11 +33,14 @@ class robots_txt(object):
                 if contents.length > 3 and contents not "404":
                     return contents
                 else:
-                    return "404"
+                    #return "404"
+                    return ""
             else:
-                return "404"
+                #return "404"
+                return ""
         except:
-            return "request failed"
+            #return "request failed"
+            return ""
 
 
 if __name__ == "__main__":

@@ -1,9 +1,5 @@
 # Tests the given webserver for some possibly leaky HTTP headers
 
-#
-# TODO: Check for expiration date. If set then cookies are written to disk
-#
-
 import sys, argparse
 import urllib2, cookielib
 
@@ -37,31 +33,31 @@ class cookie_settings(object):
         if len(cookies) == 0:
             print "No cookies set..."
         else:
-            #print cookies
             for cookie in cookies:
-                if verbosity:
-                    print cookie
+                if self.verbosity:
+                    print cookie.strip()
                 http_only = False
                 secure = False
+                written_to_disk = False
                 crumbs = cookie.split(";")
                 print "Analyzing: "+crumbs[0].replace("Set-Cookie: ","")
                 for crumb in crumbs:
                     if "httponly" in crumb.lower():
                         http_only = True
                     if "secure" in crumb.lower():
-                        # print "crumb lower: " + crumb.lower()
                         secure = True
+                    if "expires" in crumb.lower():
+                        written_to_disk = True
                 if not secure:
                     print "\tSecure flag is NOT set!"
-                else:
-                    print "\tSecure flag IS set"
+                #else:
+                #    print "\tSecure flag IS set"
                 if not http_only:
                     print "\tHttpOnly flag is NOT set!"
-                else:
-                    print "\tHttpOnly flag IS set"
-
-#def usage():
-#    print "Usage: %s [-p <port>] [-s|--ssl] <webserver>"
+                #else:
+                #    print "\tHttpOnly flag IS set"
+                if written_to_disk:
+                    print "\tThe cookie IS written to disk!"
 
 if __name__ == "__main__":
 

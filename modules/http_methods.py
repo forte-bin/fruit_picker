@@ -114,7 +114,7 @@ class http_methods(object):
             print "OPTIONS:\t "+str(r.status)+" ("+r.reason+")"
 
     def trace(self):
-        # TODO: This needs some work, some apps will allow TRACE on certain paths but not the root.
+        # Note: some apps will allow TRACE on certain paths but not the root
         r = self.request("TRACE", self.path, headers={"Host":self.server})
         body = r.read()
 
@@ -170,5 +170,6 @@ if __name__ == "__main__":
     verbosity = args.verbose
 	
     t = http_methods(url, port, ssl, verbosity)
-    t.print_vars()
+    if verbosity:
+        t.print_vars()
     t.test()
