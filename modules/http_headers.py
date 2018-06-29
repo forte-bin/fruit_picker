@@ -26,14 +26,14 @@ class http_headers(object):
         return c.getresponse()
 
     def test(self):
+        common      = list()
+        possible    = list()
+        missing     = list()
+        hsts_header = False
+        xframe_header = False
+        xss_header  = False
         try:
             r = self.request("GET", self.path, headers={"Host":self.server})
-            common      = list()
-            possible    = list()
-            missing     = list()
-            hsts_header = False
-            xframe_header = False
-            xss_header  = False
 
             for l in r.getheaders():
                 if "server" in l[0]:

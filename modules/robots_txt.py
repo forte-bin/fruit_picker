@@ -30,7 +30,7 @@ class robots_txt(object):
             r = self.request("GET", "/robots.txt", headers={"Host":self.server})
             if r.status == 200:
                 contents = r.read().strip()
-                if contents.length > 3 and contents not "404":
+                if contents.length > 3 and contents is not "404":
                     return contents
                 else:
                     #return "404"
